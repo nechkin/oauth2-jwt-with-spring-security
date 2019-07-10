@@ -1,0 +1,23 @@
+dependencies {
+
+    implementation "org.springframework.boot:spring-boot-autoconfigure"
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-configuration-processor'
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+    implementation 'org.springframework.security.oauth.boot:spring-security-oauth2-autoconfigure'
+
+    // The webjars "locator" is provided as a library by the webjars site, and can be used by Spring to
+    // locate static assets in webjars without needing to know the exact versions (hence the versionless /webjars/**
+    // links in the index.html). The webjar locator is activated by default in a Spring Boot app as long as you don’t
+    // switch off the MVC autoconfiguration.
+    implementation 'org.webjars:js-cookie:2.1.0'
+    implementation 'org.webjars:jquery:2.1.1'
+    implementation 'org.webjars:bootstrap:3.2.0'
+    implementation 'org.webjars:webjars-locator-core:0.37'
+
+//    testImplementation('org.springframework.boot:spring-boot-starter-test') {
+//        exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
+//        exclude group: 'junit', module: 'junit'
+//    }
+//    testImplementation 'org.springframework.security:spring-security-test'
+}

@@ -1,0 +1,46 @@
+<html>
+<head>
+    <script type="text/javascript" src="/idp-db/webjars/jquery/jquery.min.js"></script>
+</head>
+<body>
+<h1>OAuth2 Approval</h1>
+<p>Do you authorize "<span class="client-id"></span>" to access your protected resources?</p>
+<p>Select the scopes to approve for the "<span class="client-id"></span>"</p>
+<form id="confirmationForm" name="confirmationForm" action="/idp-db/oauth/authorize" method="post">
+    <input name="user_oauth_approval" value="true" type="hidden">
+    <input id="csrf-input" type="hidden" name="" value="" />
+    <ul id="scopes-list"></ul>
+    <label>
+        <input name="authorize" value="Authorize" type="submit">
+    </label>
+</form>
+<script type="text/javascript">
+    $.get("/idp-db/client-confirm-info", function (data) {
+        var $csrf = $("#csrf-input");
+        $csrf.attr('name', data.csrfParamName);
+        $csrf.val(data.csrfToken);
+
+        $(".client-id").text(data.clientId);
+
+        for (var scope in data.scopes) {
+            if (data.scopes.hasOwnProperty(scope)) {
+                $("#scopes-list").append(makeListItem(scope, data.scopes[scope] === "true"));
+            }
+        }
+
+    });
+
+    var makeListItem = function (scope, approved) {
+        var approve = (approved ? 'checked=""' : '');
+        var deny = (approved ? '' : 'checked=""') ;
+        return '<li>' +
+            '<div>' + scope + ':\n' +
+            '    <label><input type="radio" name="' + scope + '" value="true"'+ approve + '>Approve</label>\n' +
+            '    <label><input type="radio" name="' + scope + '" value="false"'+ deny + '>Deny</label>\n' +
+            '</div>' +
+            '</li>';
+    };
+
+</script>
+</body>
+</html>

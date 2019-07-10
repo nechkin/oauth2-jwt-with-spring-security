@@ -1,0 +1,25 @@
+server:
+  port : 8082
+  servlet:
+    context-path: /idp-db
+
+spring:
+  jpa:
+    database: POSTGRESQL
+    open-in-view: false
+    show-sql: false
+    hibernate:
+      ddl-auto: validate
+  datasource:
+    username: psqluser
+    password: psqlpwd
+    platform: postgres
+    driverClassName: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:5432/oauth_db
+    initialization-mode: always
+
+logging:
+  level:
+    org:
+      springframework:
+        security: DEBUG

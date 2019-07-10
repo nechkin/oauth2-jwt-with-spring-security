@@ -1,0 +1,12 @@
+version: '3.4'
+services:
+  postgresscs:
+    image: postgres:11.4
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_USER=psqluser
+      - POSTGRES_PASSWORD=psqlpwd
+      - POSTGRES_DB=oauth_db
+    volumes:
+      - ~/psql_data_tmp:/var/lib/postgresql/data

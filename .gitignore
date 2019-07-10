@@ -27,3 +27,6 @@ libs
 out/
 */generated-*/
 !*/generated-jooq*/
+HELP.md
+lombok.config
+gradle.properties

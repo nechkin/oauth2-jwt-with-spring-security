@@ -1,0 +1,84 @@
+oauth2:
+  facebook:
+    client:
+      clientId: 233668646673605
+      clientSecret: 33b17e044ee6a4fa383f46ec6e28ea1d
+      accessTokenUri: https://graph.facebook.com/oauth/access_token
+      userAuthorizationUri: https://www.facebook.com/dialog/oauth
+      tokenName: oauth_token
+      authenticationScheme: query
+      clientAuthenticationScheme: form
+    resource:
+      userInfoUri: https://graph.facebook.com/me
+  github:
+    client:
+      clientId: bd1c0a783ccdd1c9b9e4
+      clientSecret: 1a9030fbca47a5b2c28e92f19050bb77824b5ad1
+      accessTokenUri: https://github.com/login/oauth/access_token
+      userAuthorizationUri: https://github.com/login/oauth/authorize
+      clientAuthenticationScheme: form
+    resource:
+      userInfoUri: https://api.github.com/user
+  demo:
+    client:
+      client-id: demo
+      client-secret: demosecret
+      access-token-uri: http://localhost:8081/idp/oauth/token
+      user-authorization-uri: http://localhost:8081/idp/oauth/authorize
+      # how to supply the token when making userInfoUri request. For 'header' a "Bearer" header with the token is
+      # added to the request.
+      authenticationScheme: header
+      # how to supply the client credentials when making access-token-uri request. For 'header' a Basic "Authorization"
+      # header with base64 encoded client credentials is added to the request.
+      clientAuthenticationScheme: header
+    resource:
+      userInfoUri: http://localhost:8081/idp/me
+  demo-db:
+    client:
+      client-id: db_client
+      client-secret: db_client_password
+      access-token-uri: http://127.0.0.1:8082/idp-db/oauth/token
+      user-authorization-uri: http://127.0.0.1:8082/idp-db/oauth/authorize
+      # 'header' is the default authenticationScheme and clientAuthenticationScheme
+    resource:
+      userInfoUri: http://127.0.0.1:8082/idp-db/me
+
+# TODO: move to readme
+#
+# The context path has to be explicit if you are running both the client and the auth server on localhost, otherwise
+# the cookie paths clash and the two apps cannot agree on a session identifier.
+#
+# NB! Using localhost for this app and another hostname, e.g. 127.0.0.1, for Authorization Server, or using explicit
+# context path (/idp) is important.
+# Otherwise, a CSRF protection ensured by the state parameter will fail the redirected request to this app's
+# redirectUri after acquiring the authorization code. This happens because cookie paths clash and the apps cannot agree
+# on a session identifier - original session, assigned by YouEyeApplication when it is first accessed gets
+# overwritten by the Authorization Server app.
+#
+# Though it's a trivial scenario, I went through some pain debugging the case, so here's the erroneous flow:
+# 1. Resource owner (user) goes to the Client App on "localhost"
+# 2. Opt to authenticate with the Authorization Server. As per OAuth2ClientConfiguration a session scoped session is
+#    created (redirect response contains a cookie, DefaultOAuth2ClientContext that holds the state parameter is
+#    associated to this cookie.)
+# 3. Redirect to "get authentication code" url at the Authorization Server, that is hosted on "localhost". User is
+#    not logged in, and redirected to the login page. Authorization Server is configured
+#    with session policy to create a new session if required, i.e. if user is not authenticated a new session will be
+#    created to every request, and a new JSESSIONID SET-COOKIE header will be sent to user.
+# 4. User logs in. After login, a new JSESSIONID cookie for localhost is set again, user is redirected to the page she
+#    visited before login ("get authorization code"), a successful response with a redirect back to the Client
+#    Applications is recieve by user's user agent (no SET-COOKIE here, since user is authenticated, but still the
+#    cookie for localhost is Authorizartion Server bound now)
+# 5. After redirect to the Client Application, authorization code is contained in the url, so Spring tries to get the
+#    auth token from the Authorization Server, but fails the state parameter check, because a new session was created
+#    (As per OAuth2ClientConfiguration), because current cookie for localhost is unkonwn to the Client Application.
+#    The original, for which the state parameter was saved in paragraph 1. is missing
+#
+# Try changing user-authorization-uri from 127.0.0.1 to localhost and running the apps on the localhost.
+# Fails here org.springframework.security.oauth2.client.token.grant.code.AuthorizationCodeAccessTokenProvider#getParametersForTokenRequest
+# Check the browser's network tab to follow the redirect and how cookies are changed
+
+logging:
+  level:
+    org:
+      springframework:
+        security: DEBUG

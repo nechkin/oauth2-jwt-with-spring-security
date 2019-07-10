@@ -15,7 +15,11 @@ pluginManagement {
 
 rootProject.name = 'oauth2-jwt-with-spring-security'
 include 'authorization-server'
+include 'client-application-ui'
+include 'jwt-authorization-server'
+include 'resource-jwt-greeting'
 
+// to use custom names for subproject build files, instead of build.gradle
 rootProject.children.each { subproject ->
 	subproject.buildFileName = "${subproject.name}.gradle"
 }

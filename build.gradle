@@ -5,48 +5,43 @@ buildscript {
 		mavenCentral()
 		maven { url 'https://repo.spring.io/snapshot' }
 		maven { url 'https://repo.spring.io/milestone' }
+		maven { url 'https://plugins.gradle.org/m2/' }
 	}
 
 	ext {
+//		springBootVersion = '2.2.0.M4'
+//		lombokPluginVersion = '3.8.0'
 		lombokVersion = '1.18.8'
+		postgresqlVersion = '42.2.6'
+		springOauth2AutoconfigureVersion = '2.1.6.RELEASE'
 	}
+
+	// legacy plugin application, instead of plugins block
+//	dependencies {
+//		classpath "org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}"
+//		classpath "io.freefair.gradle:lombok-plugin:${lombokPluginVersion}"
+//	}
 }
 
 plugins {
-	id 'java'
-	id 'idea'
-	id "org.springframework.boot" version '2.2.0.M4'
-
-	// don't want to specify the version here, so using the apply plugin
-//	 id "io.spring.dependency-management" version "1.0.8.RELEASE"
-
+	id 'org.springframework.boot' version '2.2.0.M4' apply false
 	id "io.freefair.lombok" version "3.8.0"
 }
 
-//allprojects {
-//	apply plugin: 'java'
-//	apply plugin: 'idea'
-//	apply plugin: 'io.spring.dependency-management'
-//
-//	repositories {
-//		jcenter()
-//		mavenCentral()
-//		maven { url = "http://packages.confluent.io/maven/" }
-//		maven { url = "https://repo.spring.io/libs-milestone" }
-//		maven { url = "https://artifacts.elastic.co/maven" }
-//	}
-//}
-
-subprojects {
+allprojects {
 	apply plugin: 'java'
 	apply plugin: 'idea'
-	apply plugin: 'io.spring.dependency-management'
+}
 
-	group = 'com.example'
+subprojects {
+	apply plugin: 'io.spring.dependency-management'
+	apply plugin: 'io.freefair.lombok'
+	apply plugin: 'org.springframework.boot'
+
+	group = 'com.demo'
 	version = '0.0.1-SNAPSHOT'
 	sourceCompatibility = '11'
 	targetCompatibility = '11'
-
 
 	repositories {
 		jcenter()
@@ -62,6 +57,8 @@ subprojects {
 		}
 		dependencies {
 			dependency "org.projectlombok:lombok:${lombokVersion}"
+			dependency "org.postgresql:postgresql:${postgresqlVersion}"
+			dependency "org.springframework.security.oauth.boot:spring-security-oauth2-autoconfigure:${springOauth2AutoconfigureVersion}"
 		}
 	}
 

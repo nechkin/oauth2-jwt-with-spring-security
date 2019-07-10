@@ -2,12 +2,7 @@ dependencies {
 
     implementation "org.springframework.boot:spring-boot-autoconfigure"
     implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-configuration-processor'
     implementation 'org.springframework.boot:spring-boot-starter-security'
     implementation 'org.springframework.security.oauth.boot:spring-security-oauth2-autoconfigure'
-
-//    testImplementation('org.springframework.boot:spring-boot-starter-test') {
-//        exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
-//        exclude group: 'junit', module: 'junit'
-//    }
-//    testImplementation 'org.springframework.security:spring-security-test'
 }
