@@ -6,17 +6,19 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.oauth2.provider.OAuth2Authentication;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.websocket.server.PathParam;
 import java.security.Principal;
 
 @RestController
 @SpringBootApplication
-public class ResourceJwtGreetingApplication extends WebSecurityConfigurerAdapter {
+public class ResourceJwtEchoApplication extends WebSecurityConfigurerAdapter {
 
     public static void main(String[] args) {
-        SpringApplication.run(ResourceJwtGreetingApplication.class, args);
+        SpringApplication.run(ResourceJwtEchoApplication.class, args);
     }
 
     @Override
@@ -24,15 +26,16 @@ public class ResourceJwtGreetingApplication extends WebSecurityConfigurerAdapter
         http.formLogin().disable();
     }
 
-    @RequestMapping("/hello")
-    public String hello(Principal principal) {
+    @RequestMapping("/echo/{message}")
+    public String hello(Principal principal, @PathVariable("message") String message) {
         if (principal instanceof OAuth2Authentication) {
             OAuth2Authentication authentication = (OAuth2Authentication) principal;
             if (authentication.getPrincipal() instanceof JwtUser) {
                 JwtUser jwtUser = (JwtUser) authentication.getPrincipal();
-                return "Hello, " + jwtUser.getUsername() + "! Your custom info is: " + jwtUser.getCustomInfo() + "\n";
+                return "Hello, " + jwtUser.getUsername() + "! Your custom info is: " + jwtUser.getCustomInfo() +
+                        ". You sent: " + message + "\n";
             }
         }
-        return "Hello " + (principal != null ? principal.getName() : " ") + "!\n";
+        return "Hello " + (principal != null ? principal.getName() : " ") + "!" + ". You sent: " + message + "\n";
     }
 }

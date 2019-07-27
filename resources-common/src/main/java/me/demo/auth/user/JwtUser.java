@@ -1,4 +1,4 @@
-package me.demo.auth;
+package me.demo.auth.user;
 
 import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;

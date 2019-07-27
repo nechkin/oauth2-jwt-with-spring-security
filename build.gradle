@@ -36,7 +36,6 @@ allprojects {
 subprojects {
 	apply plugin: 'io.spring.dependency-management'
 	apply plugin: 'io.freefair.lombok'
-	apply plugin: 'org.springframework.boot'
 
 	group = 'com.demo'
 	version = '0.0.1-SNAPSHOT'
@@ -65,4 +64,8 @@ subprojects {
 	test {
 		useJUnitPlatform()
 	}
+}
+
+configure(subprojects.findAll {it.name != 'resources-common'}) {
+	apply plugin: 'org.springframework.boot'
 }

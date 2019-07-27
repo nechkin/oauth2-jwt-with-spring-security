@@ -1,7 +1,6 @@
-package me.demo.auth.config;
+package me.demo.auth.user;
 
 import lombok.extern.log4j.Log4j2;
-import me.demo.auth.JwtUser;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;

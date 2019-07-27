@@ -17,7 +17,9 @@ rootProject.name = 'oauth2-jwt-with-spring-security'
 include 'authorization-server'
 include 'client-application-ui'
 include 'jwt-authorization-server'
+include 'resources-common'
 include 'resource-jwt-greeting'
+include 'resource-jwt-echo'
 
 // to use custom names for subproject build files, instead of build.gradle
 rootProject.children.each { subproject ->

@@ -1,5 +1,5 @@
 dependencies {
-    implementation project(":resources-common")
+    compile project(":resources-common")
 
     implementation "org.springframework.boot:spring-boot-autoconfigure"
     implementation 'org.springframework.boot:spring-boot-starter-web'

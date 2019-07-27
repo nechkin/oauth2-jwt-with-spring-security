@@ -25,7 +25,7 @@ INSERT INTO oauth_client_details
 	additional_information, autoapprove, resource_ids)
 VALUES
 ('check_token_client',
- 'todo',
+ '$2y$07$lhPiItllYTQeuV6o4jn99OOtWXP7SeuVVIfB9NV2.1IJXAGdtebwi',
  null,
  null,
  null,

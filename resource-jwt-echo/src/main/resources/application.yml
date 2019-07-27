@@ -1,0 +1,10 @@
+server:
+  port : 8084
+  servlet:
+    context-path: /res-echo
+
+logging:
+  level:
+    org:
+      springframework:
+        security: DEBUG
