@@ -30,9 +30,12 @@ public class ResourceServerConfiguration extends ResourceServerConfigurerAdapter
     public ResourceServerTokenServices tokenServices() {
         final RemoteTokenServices remoteTokenServices = new RemoteTokenServices();
         remoteTokenServices.setCheckTokenEndpointUrl("http://localhost:8082/idp-db/oauth/check_token");
-        remoteTokenServices.setClientId("check_token_client");      // client defined in jwt-authorization-server data.sql
+
+        // same client defined in jwt-authorization-server data.sql
+        remoteTokenServices.setClientId("check_token_client");
         remoteTokenServices.setClientSecret("check_token_pass");
-        remoteTokenServices.setTokenName("token");                  // endpoint param for the token
+        // request parameter for the token
+        remoteTokenServices.setTokenName("token");
 
         DefaultAccessTokenConverter converter = new DefaultAccessTokenConverter();
         converter.setUserTokenConverter(new CustomUserAuthenticationConverter());

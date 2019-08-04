@@ -19,6 +19,12 @@ public class UserDataRepository {
                 .customInfo("john's custom info")
                 .build()
         );
+        userRepository.put("mary", UserData.builder()
+                .password(passwordEncoder.encode("s3cr3t"))
+                .authorities("ROLE_USER,ROLE_EXTENDED")
+                .customInfo("john's custom info")
+                .build()
+        );
     }
 
     public Optional<UserData> getByUsername(final String username) {

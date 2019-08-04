@@ -21,7 +21,7 @@ import java.util.Map;
 @Configuration
 @EnableResourceServer
 public class ResourceServerConfiguration extends ResourceServerConfigurerAdapter {
-    // private static final String JWT_VERIFIER_PUBLIC_KEY_FILE = "me/demo/auth/config/jwt_verifier_public_key.txt";
+    // private static final String JWT_VERIFIER_PUBLIC_KEY_FILE = "me/demo/auth/jwt_verifier_public_key.txt";
 
     @Override
     public void configure(final ResourceServerSecurityConfigurer config) {
@@ -32,7 +32,15 @@ public class ResourceServerConfiguration extends ResourceServerConfigurerAdapter
 
     @Override
     public void configure(HttpSecurity http) throws Exception {
-        http.authorizeRequests().anyRequest().authenticated();
+        // @formatter:off
+        http
+                .requestMatchers().antMatchers("/oauth/**")
+                .and()
+                    .authorizeRequests()
+                        .antMatchers("/oauth/hello").access("#oauth2.hasScope('read')")
+                        .antMatchers("/oauth/helloWriteOrExtended")
+                            .access("#oauth2.hasScope('write') or hasRole('ROLE_EXTENDED')");
+        // @formatter:on
     }
 
     @Bean

@@ -90,8 +90,8 @@ public class OAuth2ServerConfiguration extends AuthorizationServerConfigurerAdap
                 // with no harm
                 // .approvalStore(approvalStore)
 
-                // custom logic for client approval (e.g. enable auto approve, if client was approved before, that is
-                // approvalStore contains at least one approved scope for that client)
+                // custom logic for client approval (e.g. enable auto approve, if client was approved before. Client
+                // is considered approved if at least one approved scope for that client is found in the approvalStore.
                 // .userApprovalHandler(userApprovalHandler)
     }
 
