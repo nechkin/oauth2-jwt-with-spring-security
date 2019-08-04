@@ -1,4 +1,54 @@
-## Basic overview of OAuth2 flow
+## Description
+
+This is a demo project for Oauth2 capabilities with Spring Security Oauth. Some of the features used: single sign on 
+with OAuth2 using authorization grant type, separating Authorization and Resource Servers, encoding user data in JWT 
+tokens, using JDBC token store, password grant type. Note that plain http is used, and OAuth2 communication is not 
+encrypted, including the tokens.
+
+## Components
+
+There is a number of standalone Spring Boot applications. A short description for the purpose of each one:
+
+1. <b>authorization-server</b> - a simple oauth authorization server, using in memory token store. It also acts as a 
+resource server to expose an endpoint with user data, this endpoint is token protected.
+2. <b>jwt-authorization-server</b> - another authorization server, this one uses JdbcTokenStore. Also has an endpoint 
+for user data. The token is a Json Web Tone (see https://jwt.io), It contains user data, user roles and is signed 
+with asymmetric key (again, it's not encryptes, just has a signature, so the resource server can verify that the 
+token was not tempered with). A custom access confirmation page is defined as an example (a page where the user 
+specifies which scopes it approves for the client application) . 
+3. <b>client-application-ui</b> - a minimal MVC application with a single page to login and display some info for the
+ authenticated user. It uses the token acquired during authentication to access Resource Server via Oauth2RestTemplate.
+4. <b>resource-jwt-greeting</b> - a resource server. It uses JwtAccessTokenConverter to decode tokens, and uses 
+the public part of the verification key from the authorization server to verify tokens. The public key is requested 
+from the authorization server /oauth/token_key endpoint on startup. 
+5. <b>resource-jwt-echo</b> - a resource server. It uses authorization server /oauth/check_token endpoint to decode 
+tokens (verification is done on). Every request with the token result in a verification request to the authorization 
+server. 
+
+
+## Run the app
+
+Build it: 
+
+`./gradlew assemble`
+
+Run postgre for the JBDC token store:
+
+```
+cd docker/postgre
+docker-compose up -d
+```
+
+Run it:
+```
+./gradlew authorization-server:bootRun
+./gradlew client-application-ui:bootRun
+./gradlew jwt-authorization-server:bootRun
+./gradlew resource-jwt-echo:bootRun
+./gradlew resource-jwt-greeting:bootRun
+```
+
+## Basic overview of OAuth2 flows
 
 #### Authorization code grant type
 
@@ -9,12 +59,16 @@
 ([authorization code grant](https://tools.ietf.org/html/rfc6749#section-4))
 4. If necessary, the identity provider authenticates the user (perhaps by asking them for their username and password)
 5. Once the identity provider is satisfied that the user is sufficiently authenticated, it processes the application's 
-request, formulates a response, and sends that back to the user along with a redirect URL back to the application.
+request, formulates a response, and sends that back to the user along with a redirect URL back to the application. 
+The redirect URL contains the authorization code.
 6. The user's browser requests the redirect URL that goes back to the application, including the identity provider's 
-response
-7. The application decodes the identity provider's response, and carries on accordingly.
-8. The identity provider's response includes an access token which the application can use to gain direct access to 
-the identity provider's services on the user's behalf.
+authorization code.
+7. Application handles the request and uses the authorization code to request an access token from the Authorization 
+Server.
+8. The application decodes the identity provider's response, and authenticates the user. User deta can be either be 
+decoded from the token or requested from the appropriate resource using the access token.
+9. Application can use an access token to gain direct access to the identity provider's services (or other token 
+protected resources) on the user's behalf.
 
 Client Application can now use the token to access the Resource Server.
 
@@ -47,7 +101,7 @@ or
 jwt-keystore.jks -storepass storepass`
 
 Public key is required by the Resource Servers to verify the token (check that it was not tampered). Resource server 
-can request the public key from the Authorization ServerTo or have it stored statically. To export public key from the 
+can request the public key from the Authorization Server or have it stored statically. To export public key from the 
 keystore:
 
 `keytool -export -alias jwt-key-pair -keystore jwt-keystore.jks -storepass storepass | openssl x509 -inform der -pubkey -noout`
@@ -84,19 +138,26 @@ openssl pkcs12 -in keystore.p12  -nokeys -out cert.pem
 openssl pkcs12 -in keystore.p12  -nodes -nocerts -out key.pem
 ```
 
-## readme TODOs:
+## Note on JDBC token store:
 
-about schema and data
-(check out Spring's JdbcClientDetailsService, it uses the schema...)
-Spring Boot can automatically create the schema (DDL scripts) of your DataSource and initialize it (DML scripts). It loads SQL from the standard root classpath locations: schema.sql and data.sql
+Spring Boot can automatically create the schema (DDL scripts) of your DataSource and initialize it (DML scripts). 
+It loads SQL from the standard root classpath locations: schema.sql and data.sql. (see JdbcClientDetailsService)
 
+Sot the schema and data for oauth jdbc store can be found the mentioned file for the <b>jwt-authorization-server</b> 
+application
 
+## Example requests to use the password grant type
+
+Obtaine a token:
+```
 curl db_client:db_client_password@localhost:8082/idp-db/oauth/token -d grant_type=password -d username=john -d password=secret
 {"access_token":"eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOlsiaWRwLWRiLXJlc291cmNlIl0sInVzZXJfbmFtZV9jbGFpbSI6ImpvaG4iLCJ1c2VyX25hbWUiOiJqb2huIiwic2NvcGUiOlsicmVhZCIsIndyaXRlIl0sImN1c3RvbV9qd3RfY2xhaW0iOiJteSBjdXN0b20gdXNlciBkYXRhIiwiZXhwIjoxNTYzOTA4Mjc3LCJhdXRob3JpdGllcyI6WyJST0xFX1VTRVIiXSwianRpIjoiYzZhYzM3MzUtMjFlYy00ZjU2LTk5ODAtMzY0MmIwYWU0ZTE5IiwiY2xpZW50X2lkIjoiZGJfY2xpZW50In0.vm9ILXjnMHmyzkr8dd5C6Ec6W-OVSga3SO31D9g690kAXt1jht3RI3DKGIf-EDzDwfvPqsWhTCfoCSPkx8LMdLDDgx8F9GG_wFI6vs6CmA8JiqRZBAUTCQYs9-qgN5iNmsmoMw_-SVZVMTkzUH8v2E2TbZpB3DoirQGYbsrmCGTFTP0veYDlP0NLMm2vO3-bx1udpdN54FJw1pJ_frluUsLN2Uh68Hm0SHM-fLzVf70RyKIcbk44qCL7bfxcOClZJYgsmCEOE8jH4w6o838rMWYNhIh46lRl6fsWs5wbRhTWtsEH1EN_CWqsOyWeDDTcsbGiQE9BladBYX43ePyx6w","token_type":"bearer","expires_in":3599,"scope":"read write","jti":"c6ac3735-21ec-4f56-9980-3642b0ae4e19"}
+```
 
-curl -X GET -H 'Authorization: Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOlsiaWRwLWRiLXJlc291cmNlIiwicmVzb3VyY2Utand0LWdyZWV0aW5nIl0sInVzZXJfbmFtZSI6ImpvaG4iLCJzY29wZSI6WyJyZWFkIiwid3JpdGUiXSwiY3VzdG9tX2p3dF9jbGFpbSI6ImpvaG4ncyBjdXN0b20gaW5mbyIsImV4cCI6MTU2NDI1MTk4MCwiYXV0aG9yaXRpZXMiOlsiUk9MRV9VU0VSIl0sImp0aSI6IjA5OTBhZDU1LWQ5NjYtNDQ3Zi1hNzQxLTA0ZDMwMjQ1ZDlkMiIsImNsaWVudF9pZCI6ImRiX2NsaWVudCJ9.eAzn7MA7lZe2buyS0JORpjDeo2-DNRmC1zRKA1lcZq3nUHep4pykU5YIKjhycaYTRK7FwP1vonSY2OPjVt6n1HlwpFIJ1HvP-ESncqhZ8ZGIZHK8j9R84I2nADjrqjWufYweiOSGpY1p1KXBAc6YsQrvEDrsP-DCSe2lrWHQ3xbBefcIpyPV3lxpNTuVtIDyHMI3c88zlzHs0cv5H3eELORa5ak9DJJLoR1vLtmkYHsqejsEdzcrgU6xfYada4-QeRsNybodg9xrSiaktXhtRCoIxe84f7xHsn_sOoCyZreo4MPbLRMMWD5wBhSC-eTQRsmNpXSybFyh4ofUNPralQ' localhost:8083/res-greet/hello
-
-curl -X GET -H 'Authorization: Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOlsiaWRwLWRiLXJlc291cmNlIiwicmVzb3VyY2Utand0LWdyZWV0aW5nIl0sInVzZXJfbmFtZSI6ImpvaG4iLCJzY29wZSI6WyJyZWFkIiwid3JpdGUiXSwiY3VzdG9tX2p3dF9jbGFpbSI6ImpvaG4ncyBjdXN0b20gaW5mbyIsImV4cCI6MTU2NDI1MTk4MCwiYXV0aG9yaXRpZXMiOlsiUk9MRV9VU0VSIl0sImp0aSI6IjA5OTBhZDU1LWQ5NjYtNDQ3Zi1hNzQxLTA0ZDMwMjQ1ZDlkMiIsImNsaWVudF9pZCI6ImRiX2NsaWVudCJ9.eAzn7MA7lZe2buyS0JORpjDeo2-DNRmC1zRKA1lcZq3nUHep4pykU5YIKjhycaYTRK7FwP1vonSY2OPjVt6n1HlwpFIJ1HvP-ESncqhZ8ZGIZHK8j9R84I2nADjrqjWufYweiOSGpY1p1KXBAc6YsQrvEDrsP-DCSe2lrWHQ3xbBefcIpyPV3lxpNTuVtIDyHMI3c88zlzHs0cv5H3eELORa5ak9DJJLoR1vLtmkYHsqejsEdzcrgU6xfYada4-QeRsNybodg9xrSiaktXhtRCoIxe84f7xHsn_sOoCyZreo4MPbLRMMWD5wBhSC-eTQRsmNpXSybFyh4ofUNPralQ' localhost:8084/res-echo/echo/test
+Use the token to access the resource:
+```
+curl -X GET -H 'Authorization: Bearer <token>' localhost:8083/oauth/res-greet/hello
+```
 
 ## Links
 

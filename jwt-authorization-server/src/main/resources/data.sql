@@ -14,7 +14,7 @@ VALUES
  3600,
  null,
  false,
- 'idp-db-resource,resource-jwt-greeting')
+ 'idp-db-resource,resource-jwt-greeting,resource-jwt-echo')
 ON CONFLICT DO NOTHING;
 
 -- client that is actually a resource server and uses /oauth/check_token to decode tokens

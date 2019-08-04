@@ -16,7 +16,7 @@ import org.springframework.security.oauth2.provider.token.ResourceServerTokenSer
 public class ResourceServerConfiguration extends ResourceServerConfigurerAdapter {
     @Override
     public void configure(final ResourceServerSecurityConfigurer config) {
-        config.resourceId("resource-jwt-greeting")
+        config.resourceId("resource-jwt-echo")
                 .tokenServices(tokenServices())
                 .stateless(true);
     }
