@@ -1,8 +1,11 @@
 package me.demo.youeye;
 
 import lombok.extern.log4j.Log4j2;
+import me.demo.youeye.config.resources.FacebookResourcesProperties;
+import me.demo.youeye.controller.GreetingResourceProperties;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.event.EventListener;
 import org.springframework.security.authentication.event.AuthenticationSuccessEvent;
 import org.springframework.security.core.Authentication;
@@ -14,8 +17,8 @@ import java.security.Principal;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+@EnableConfigurationProperties(GreetingResourceProperties.class)
 @Log4j2
-@RestController
 @SpringBootApplication
 public class YouEyeApplication {
 
@@ -33,17 +36,5 @@ public class YouEyeApplication {
                 log.info("Unexpected auth object {}", auth);
             }
         }
-    }
-
-    /**
-     * /user endpoint, it is secured with cookies created when the user authenticates
-     * @param principal authenticated user for session identified by cookie
-     * @return map with principal name under the key 'name'
-     */
-    @RequestMapping("/user")
-    public Map<String, String> user(Principal principal) {
-        Map<String, String> map = new LinkedHashMap<>();
-        map.put("name", principal.getName());
-        return map;
     }
 }

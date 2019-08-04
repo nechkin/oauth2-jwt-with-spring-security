@@ -34,7 +34,8 @@ public class ResourceServerConfiguration extends ResourceServerConfigurerAdapter
     public void configure(HttpSecurity http) throws Exception {
         // @formatter:off
         http
-                .requestMatchers().antMatchers("/oauth/**")
+                .requestMatchers()
+                    .antMatchers("/oauth/**")
                 .and()
                     .authorizeRequests()
                         .antMatchers("/oauth/hello").access("#oauth2.hasScope('read')")

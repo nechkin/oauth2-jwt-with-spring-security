@@ -77,6 +77,12 @@ oauth2:
 # Fails here org.springframework.security.oauth2.client.token.grant.code.AuthorizationCodeAccessTokenProvider#getParametersForTokenRequest
 # Check the browser's network tab to follow the redirect and how cookies are changed
 
+resource:
+  greeting:
+    hello-url: "http://localhost:8083/res-greet/oauth/hello"
+    hello-extended-url: "http://localhost:8083/res-greet/oauth/helloExtended"
+    hello-write-or-extended-url: "http://localhost:8083/res-greet/oauth/helloWriteOrExtended"
+
 logging:
   level:
     org:

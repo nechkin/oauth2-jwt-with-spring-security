@@ -31,6 +31,18 @@
 
     <div class="authenticated" style="display: none">
         Logged in as: <span id="user"></span>
+
+        <div>
+            Hello (must be logged in with db-client user): <span id="resource-hello"></span>
+        </div>
+        <div>
+            Hello extended (user must have ROLE_EXTENDED): <span id="resource-hello-extended"></span>
+        </div>
+        <div>
+            Hello write or extended (client app should have 'write' scope approved of user must have ROLE_EXTENDED):
+            <span id="resource-hello-write-or-extended"></span>
+        </div>
+
         <div>
             <button onClick="logout()" class="btn btn-primary">Logout</button>
         </div>
@@ -54,11 +66,13 @@
     $.get("/user", function (data) {
         $("#user").html(data.name);
         if (data.name === undefined) {
-            console.log("HERE");
             logout();
         } else {
             $(".unauthenticated").hide();
             $(".authenticated").show();
+            getString("/hello", $("#resource-hello"));
+            getString("/helloExtended", $("#resource-hello-extended"));
+            getString("/helloWriteOrExtended", $("#resource-hello-write-or-extended"));
         }
     });
     var logout = function () {
@@ -68,7 +82,12 @@
             $(".authenticated").hide();
         });
         return true;
-    }
+    };
+    var getString = function (url, element) {
+        $.get(url).then(function (response) {
+            element.text(response);
+        });
+    };
 </script>
 </body>
 </html>
