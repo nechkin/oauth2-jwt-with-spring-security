@@ -1,7 +1,6 @@
 package me.demo.auth.config;
 
-import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
+import me.demo.auth.user.JwtUserDetailsService;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -38,18 +37,21 @@ public class OAuth2ServerConfiguration extends AuthorizationServerConfigurerAdap
     private final DataSource dataSource;
     private final TokenStore tokenStore;
     private final JwtAccessTokenConverter accessTokenConverter;
+    private final JwtUserDetailsService jwtUserDetailsService;
 
     public OAuth2ServerConfiguration(
             @Qualifier("authenticationManagerBean") AuthenticationManager authenticationManager,
             PasswordEncoder passwordEncoder,
             DataSource dataSource,
             TokenStore tokenStore,
-            JwtAccessTokenConverter accessTokenConverter) {
+            JwtAccessTokenConverter accessTokenConverter,
+            JwtUserDetailsService jwtUserDetailsService) {
         this.tokenStore = tokenStore;
         this.accessTokenConverter = accessTokenConverter;
         this.authenticationManager = authenticationManager;
         this.passwordEncoder = passwordEncoder;
         this.dataSource = dataSource;
+        this.jwtUserDetailsService = jwtUserDetailsService;
     }
 
     @Override
@@ -83,7 +85,9 @@ public class OAuth2ServerConfiguration extends AuthorizationServerConfigurerAdap
                 // Here using the same authenticationManager as configured in the web security config of this app.
                 .authenticationManager(authenticationManager)
                 .tokenStore(tokenStore)
-                .accessTokenConverter(accessTokenConverter);
+                .accessTokenConverter(accessTokenConverter)
+                // For refresh tokens to work (see AuthorizationServerEndpointsConfigurer#addUserDetailsService):
+                .userDetailsService(jwtUserDetailsService);
 
                 // By default a TokenApprovalStore will be constructed backed by the same tokenStore as configured
                 // for approvalStore below, so no need to supply the same approval store here, though it can be done
