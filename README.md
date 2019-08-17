@@ -65,7 +65,7 @@ The redirect URL contains the authorization code.
 authorization code.
 7. Application handles the request and uses the authorization code to request an access token from the Authorization 
 Server.
-8. The application decodes the identity provider's response, and authenticates the user. User deta can be either be 
+8. The application decodes the identity provider's response, and authenticates the user. User data can either be 
 decoded from the token or requested from the appropriate resource using the access token.
 9. Application can use an access token to gain direct access to the identity provider's services (or other token 
 protected resources) on the user's behalf.
